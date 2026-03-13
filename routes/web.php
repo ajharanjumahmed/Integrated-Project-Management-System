@@ -11,4 +11,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 });
 
+Route::middleware(['auth', 'role:CEO'])->group(function () {
+
+    Route::get('/ceo-dashboard', function () {
+        return "CEO Dashboard";
+    });
+
+});
+
+Route::middleware(['auth', 'role:Project Manager'])->group(function () {
+
+    Route::get('/manager-dashboard', function () {
+        return "Manager Dashboard";
+    });
+
+});
+
+Route::middleware(['auth', 'role:Designer,Developer'])->group(function () {
+
+    Route::get('/tasks', function () {
+        return "Task Board";
+    });
+
+});
+
 require __DIR__.'/settings.php';
