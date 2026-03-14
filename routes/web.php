@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -37,5 +38,12 @@ Route::middleware(['auth', 'role:Designer,Developer'])->group(function () {
 });
 
 Route::middleware(['auth','role:CEO'])->get('/ceo-dashboard', [DashboardController::class, 'ceoDashboard']);
+
+Route::middleware(['auth','role:CEO'])->group(function () {
+
+    Route::resource('users', UserController::class);
+
+});
+
 
 require __DIR__.'/settings.php';

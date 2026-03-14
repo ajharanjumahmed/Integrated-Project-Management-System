@@ -1,21 +1,27 @@
 <script setup>
 
-import Navbar from '@/components/Navbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
+import Sidebar from '@/components/Sidebar.vue';
+import Navbar from '@/components/Navbar.vue';
+
+const props = defineProps({
+    title: String
+})
 
 </script>
 
 <template>
 
-<div class="flex">
+<div class="flex bg-gray-50 min-h-screen">
 
-    <Sidebar />
+    <div class="w-16 md:w-64">
+        <Sidebar />
+    </div>
 
-    <div class="flex-1 bg-gray-100 min-h-screen">
+    <div class="flex-1 flex flex-col">
 
-        <Navbar />
+        <Navbar :title="title" />
 
-        <main class="p-8">
+        <main class="p-6">
             <slot />
         </main>
 
