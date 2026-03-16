@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -17,7 +18,7 @@ class UserController extends Controller
         $users = User::with('role')
             ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', "%$search%")
-                      ->orWhere('email', 'like', "%$search%");
+                    ->orWhere('email', 'like', "%$search%");
             })
             ->latest()
             ->paginate(10)
@@ -74,11 +75,13 @@ class UserController extends Controller
             'role_id' => 'required'
         ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role_id' => $request->role_id
-        ]);
+        $data = $request->only('name', 'email', 'role_id');
+
+        if ($request->password) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
 
         return redirect()->route('users.index')
             ->with('success', 'User updated');

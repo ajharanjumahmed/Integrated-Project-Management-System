@@ -34,8 +34,8 @@ const deleteUser = (id) => {
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-        <h1 class="text-2xl font-bold text-gray-900">
-            Users
+        <h1 class="text-3xl font-bold text-gray-700">
+            Manage Users
         </h1>
 
         <Link
@@ -51,10 +51,10 @@ const deleteUser = (id) => {
         v-model="search"
         type="text"
         placeholder="Search users..."
-        class="border border-gray-400 rounded px-4 py-2 w-full md:w-80 text-gray-900"
+        class="bg-white border border-gray-300 rounded px-4 py-2 w-full md:w-80 text-gray-900"
     />
 
-    <div class="hidden md:block bg-white rounded shadow overflow-x-auto">
+    <div class="hidden md:block bg-white rounded shadow-sm overflow-x-auto">
 
         <table class="w-full text-left">
 
@@ -75,15 +75,15 @@ const deleteUser = (id) => {
                     class="border-t border-gray-200"
                 >
 
-                    <td class="p-5 text-gray-700">{{ user.name }}</td>
-                    <td class="p-5 text-gray-500">{{ user.email }}</td>
-                    <td class="p-5 text-gray-500">{{ user.role?.name }}</td>
+                    <td class="pl-5 text-gray-700">{{ user.name }}</td>
+                    <td class="pl-5 text-gray-700">{{ user.email }}</td>
+                    <td class="pl-5 text-gray-700">{{ user.role?.name }}</td>
 
-                    <td class="p-5 flex gap-3">
+                    <td class="pl-5 pt-4 pb-4 flex gap-3 ">
 
                         <Link
                             :href="`/users/${user.id}/edit`"
-                            class="px-8 py-2 bg-blue-500 text-white rounded"
+                            class="px-6 py-2 bg-blue-500 text-white text-s rounded"
                         >
                             Edit
                         </Link>
