@@ -28,7 +28,7 @@ const submit = () => {
     <div class="text-3xl font-bold text-gray-700 pb-10 pt-10">
         <h2>Create A New User</h2>
     </div>
-    <div class="bg-white p-6 rounded-xl ring-1  ring-gray-300 w-2xl">
+    <div class="bg-white p-6 rounded-xl ring-1  ring-gray-300 w-2xl mb-20">
 
         <form @submit.prevent="submit" class="space-y-6">
 

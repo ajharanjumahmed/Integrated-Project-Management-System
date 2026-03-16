@@ -19,14 +19,14 @@ const isActive = (url) => {
 
 <template>
 
-<div class="h-full bg-white border-r border-gray-300 flex flex-col">
+<div class="fixed h-full md:w-64 bg-white border-r border-gray-300 flex flex-col ">
 
-    <!-- Logo -->
+    
     <div class="h-16 flex items-center md:px-6 px-3 border-b border-gray-300 font-bold md:text-2xl text-blue-700">
         IPMS
     </div>
 
-    <!-- Navigation -->
+    
     <nav class="flex-1 px-3 py-4 space-y-3">
 
         <Link

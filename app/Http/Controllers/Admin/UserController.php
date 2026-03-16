@@ -91,6 +91,6 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return back()->with('success', 'User deleted');
+        return redirect()->route('users.index');
     }
 }
