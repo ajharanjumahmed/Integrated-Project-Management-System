@@ -6,5 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
-    //
+    protected $fillable = [
+        'project_id',
+        'sender_id',
+        'message',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
 }

@@ -1,32 +1,25 @@
 <script setup>
+import Sidebar from '@/components/Sidebar.vue'
+import Navbar from '@/components/Navbar.vue'
 
-import Sidebar from '@/components/Sidebar.vue';
-import Navbar from '@/components/Navbar.vue';
-
-const props = defineProps({
+defineProps({
     title: String
 })
-
 </script>
 
 <template>
+<div class="flex min-h-screen bg-slate-50">
 
-<div class="flex bg-gray-50 min-h-screen">
-
-    <div class="w-16 md:w-64">
+    <div class="w-16 md:w-64 shrink-0">
         <Sidebar />
     </div>
 
-    <div class="flex-1 flex flex-col">
-
+    <div class="flex-1 flex flex-col min-w-0">
         <Navbar :title="title" />
-
-        <main class="p-6">
+        <main class="flex-1 p-6 md:p-8">
             <slot />
         </main>
-
     </div>
 
 </div>
-
 </template>

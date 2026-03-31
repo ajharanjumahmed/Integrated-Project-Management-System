@@ -25,7 +25,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            // Drop the foreign key constraint first, then the column.
+            // Laravel requires this order — dropping a column with a
+            // foreign key without dropping the constraint first causes an error.
+            $table->dropForeign(['role_id']);
+            $table->dropColumn('role_id');
         });
     }
 };

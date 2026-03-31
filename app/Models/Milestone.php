@@ -6,5 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Milestone extends Model
 {
-    //
+    protected $fillable = [
+        'project_id',
+        'title',
+        'deadline',
+        'status',
+    ];
+
+    protected $casts = [
+        'deadline' => 'date',
+    ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

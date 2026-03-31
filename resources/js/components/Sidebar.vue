@@ -1,98 +1,102 @@
 <script setup>
-
-import { Link, usePage } from '@inertiajs/vue3'
-
+import { Link, usePage, router } from '@inertiajs/vue3'
 import {
-HomeIcon,
-UsersIcon,
-FolderIcon,
-ChartBarIcon
+    HomeIcon,
+    UsersIcon,
+    FolderIcon,
+    ClipboardDocumentListIcon,
+    ChatBubbleLeftRightIcon,
+    ArrowRightStartOnRectangleIcon,
 } from '@heroicons/vue/24/outline'
 
 const page = usePage()
+const user = page.props.auth.user
+const role = user?.role?.name
 
-const isActive = (url) => {
-    return page.url.startsWith(url)
+const isActive = (path) => page.url.startsWith(path)
+const logout   = () => router.post('/logout')
+
+const navItems = {
+    'CEO': [
+        { href: '/ceo-dashboard', label: 'Dashboard', icon: HomeIcon,                    match: '/ceo-dashboard' },
+        { href: '/users',         label: 'Users',      icon: UsersIcon,                   match: '/users' },
+        { href: '/projects',      label: 'Projects',   icon: FolderIcon,                  match: '/projects' },
+    ],
+    'Project Manager': [
+        { href: '/manager-dashboard', label: 'Dashboard', icon: HomeIcon,   match: '/manager-dashboard' },
+        { href: '/projects',          label: 'Projects',  icon: FolderIcon, match: '/projects' },
+    ],
+    'Designer': [
+        { href: '/designer-dashboard', label: 'Dashboard', icon: HomeIcon,                    match: '/designer-dashboard' },
+        { href: '/designer-dashboard', label: 'My Tasks',  icon: ClipboardDocumentListIcon,   match: '/my-tasks' },
+    ],
+    'Developer': [
+        { href: '/developer-dashboard', label: 'Dashboard', icon: HomeIcon,                    match: '/developer-dashboard' },
+        { href: '/developer-dashboard', label: 'My Tasks',  icon: ClipboardDocumentListIcon,   match: '/my-tasks' },
+    ],
+    'Client': [
+        { href: '/client-dashboard', label: 'Dashboard',   icon: HomeIcon,                    match: '/client-dashboard' },
+        { href: '/client-dashboard', label: 'My Projects', icon: FolderIcon,                  match: '/my-projects' },
+        { href: '/client-dashboard', label: 'Messages',    icon: ChatBubbleLeftRightIcon,      match: '/messages' },
+    ],
 }
 
+// Get the nav links for the current user's role
+const links = navItems[role] ?? []
 </script>
 
 <template>
+<div class="fixed h-full w-16 md:w-64 flex flex-col bg-[#1A3263]">
 
-<div class="fixed h-full md:w-64 bg-white border-r border-gray-300 flex flex-col ">
-
-    
-    <div class="h-16 flex items-center md:px-6 px-3 border-b border-gray-300 font-bold md:text-2xl text-blue-700">
-        IPMS
+    <div class="h-16 flex items-center md:px-5 px-3 shrink-0 bg-white/5 border-b border-white/10">
+        <span class="hidden md:block ml-3 text-white font-bold text-2xl tracking-tight">
+            IPMS
+        </span>
     </div>
 
-    
-    <nav class="flex-1 px-3 py-4 space-y-3">
+    <nav class="flex-1 px-2 md:px-3 py-4 space-y-0.5">
 
         <Link
-        href="/ceo-dashboard"
-        :class="[
-        'flex items-center gap-3 px-3 py-2 rounded-lg text-m transition',
-        isActive('/ceo-dashboard')
-        ? 'bg-blue-50 text-blue-600'
-        : 'text-gray-600 hover:bg-gray-100'
-        ]"
+            v-for="item in links"
+            :key="item.label"
+            :href="item.href"
+            :class="[
+                'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-150',
+                isActive(item.match)
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-blue-100 hover:bg-white/10 hover:text-white'
+            ]"
         >
-
-            <HomeIcon class="w-5 h-5"/>
-
-            <span class="hidden md:block">
-            Dashboard
-            </span>
-
-        </Link>
-
-        <Link
-        href="/users"
-        :class="[
-        'flex items-center gap-3 px-3 py-2 rounded-lg text-m transition',
-        isActive('/users')
-        ? 'bg-blue-50 text-blue-600'
-        : 'text-gray-600 hover:bg-gray-100'
-        ]"
-        >
-
-            <UsersIcon class="w-5 h-5"/>
-
-            <span class="hidden md:block">
-            Users
-            </span>
-
-        </Link>
-
-        <Link
-        href="/projects"
-        class="flex items-center gap-3 px-3 py-2 rounded-lg text-m text-gray-600 hover:bg-gray-100"
-        >
-
-            <FolderIcon class="w-5 h-5"/>
-
-            <span class="hidden md:block">
-            Projects
-            </span>
-
-        </Link>
-
-        <Link
-        href="/analytics"
-        class="flex items-center gap-3 px-3 py-2 rounded-lg text-m text-gray-600 hover:bg-gray-100"
-        >
-
-            <ChartBarIcon class="w-5 h-5"/>
-
-            <span class="hidden md:block">
-            Analytics
-            </span>
-
+            <component :is="item.icon" class="w-5 h-5 shrink-0" />
+            <span class="hidden md:block">{{ item.label }}</span>
         </Link>
 
     </nav>
 
-</div>
+    <div class="shrink-0 p-3 border-t border-white/10">
+        <div class="flex items-center gap-3">
 
+            <div class="w-9 h-9 rounded-xl bg-blue-400/50 border border-blue-300/30 flex items-center justify-center shrink-0">
+                <span class="text-white text-sm font-bold">
+                    {{ user?.name?.charAt(0)?.toUpperCase() }}
+                </span>
+            </div>
+
+            <div class="hidden md:block flex-1 min-w-0">
+                <p class="text-white text-sm font-medium truncate">{{ user?.name }}</p>
+                <p class="text-blue-300 text-xs truncate">{{ role }}</p>
+            </div>
+
+            <button
+                @click="logout"
+                title="Logout"
+                class="hidden md:flex text-white/40 hover:text-white transition p-2 rounded-lg hover:bg-white/10"
+            >
+                <ArrowRightStartOnRectangleIcon class="w-5 h-5" />
+            </button>
+
+        </div>
+    </div>
+
+</div>
 </template>

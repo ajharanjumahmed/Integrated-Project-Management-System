@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -16,75 +16,91 @@ class ProjectController extends Controller
             ->get();
 
         return Inertia::render('Projects/Index', [
-            'projects' => $projects
+            'projects' => $projects,
         ]);
     }
 
     public function create()
-{
-    $clients = User::whereHas('role', function ($query) {
-        $query->where('name', 'Client');
-    })
-    ->latest()
-    ->limit(8)
-    ->select('id','name')
-    ->get();
-
-    $managers = User::whereHas('role', function ($query) {
-        $query->where('name', 'Project Manager');
-    })
-    ->latest()
-    ->limit(8)
-    ->select('id','name')
-    ->get();
-
-    return Inertia::render('Projects/Create', [
-        'clients' => $clients,
-        'managers' => $managers
-    ]);
-}
+    {
+        return Inertia::render('Projects/Create', [
+            'clients'  => User::whereHas('role', fn($q) => $q->where('name', 'Client'))
+                ->select('id', 'name')->latest()->get(),
+            'managers' => User::whereHas('role', fn($q) => $q->where('name', 'Project Manager'))
+                ->select('id', 'name')->latest()->get(),
+        ]);
+    }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'client_id' => 'required',
-            'project_manager_id' => 'required',
-            'budget' => 'nullable|numeric',
+        $validated = $request->validate([
+            'title'              => 'required|string|max:255',
+            'description'        => 'nullable|string',
+            'client_id'          => 'required|exists:users,id',
+            'project_manager_id' => 'required|exists:users,id',
+            'budget'             => 'nullable|numeric|min:0',
+            'start_date'         => 'nullable|date',
+            'deadline'           => 'nullable|date|after_or_equal:start_date',
+            'status'             => 'in:pending,active,completed,cancelled',
         ]);
 
-        Project::create($request->all());
+        Project::create($validated);
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project created successfully.');
+    }
+
+    public function show(Project $project)
+    {
+        $project->load([
+            'client',
+            'manager',
+            'milestones',
+            'tasks.assignee',
+            'tasks.milestone',
+            'members',       
+            'workSessions.user',
+        ]);
+
+        return Inertia::render('Projects/Show', [
+            'project' => $project,
+        ]);
     }
 
     public function edit(Project $project)
     {
-        $users = User::select('id', 'name')->get();
-
         return Inertia::render('Projects/Edit', [
-            'project' => $project,
-            'users' => $users
+            'project'  => $project,
+            'clients'  => User::whereHas('role', fn($q) => $q->where('name', 'Client'))
+                ->select('id', 'name')->get(),
+            'managers' => User::whereHas('role', fn($q) => $q->where('name', 'Project Manager'))
+                ->select('id', 'name')->get(),
         ]);
     }
 
     public function update(Request $request, Project $project)
     {
-        $request->validate([
-            'title' => 'required',
-            'client_id' => 'required',
-            'project_manager_id' => 'required'
+        $validated = $request->validate([
+            'title'              => 'required|string|max:255',
+            'description'        => 'nullable|string',
+            'client_id'          => 'required|exists:users,id',
+            'project_manager_id' => 'required|exists:users,id',
+            'budget'             => 'nullable|numeric|min:0',
+            'start_date'         => 'nullable|date',
+            'deadline'           => 'nullable|date|after_or_equal:start_date',
+            'status'             => 'in:pending,active,completed,cancelled',
         ]);
 
-        $project->update($request->all());
+        $project->update($validated);
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project updated successfully.');
     }
 
     public function destroy(Project $project)
     {
         $project->delete();
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project deleted.');
     }
 }
