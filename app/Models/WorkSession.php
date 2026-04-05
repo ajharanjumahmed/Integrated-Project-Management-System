@@ -28,4 +28,9 @@ class WorkSession extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function scopeActive($query)
+    {
+        return $query->whereNull('end_time');
+    }
 }

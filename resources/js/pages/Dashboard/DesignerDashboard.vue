@@ -28,7 +28,8 @@ const formatDate = (d) => d
     ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : '—'
 
-const isOverdue = (d) => d && new Date(d) < new Date()
+const isOverdue = (d) => d &&  formatDate(new Date()) > formatDate(d)
+
 </script>
 
 <template>
@@ -83,7 +84,7 @@ const isOverdue = (d) => d && new Date(d) < new Date()
 
             <div class="px-5 py-4 border-b border-slate-100">
                 <h2 class="font-semibold text-slate-800">My Tasks</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Pending & in-progress, by deadline</p>
+                <p class="text-xs text-slate-400 mt-1">All pending & in-progress tasks</p>
             </div>
 
             <div v-if="!tasks.length"
@@ -137,7 +138,7 @@ const isOverdue = (d) => d && new Date(d) < new Date()
                 <div v-for="project in projects" :key="project.id"
                      class="px-5 py-4 flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-slate-800">{{ project.name }}</p>
+                        <p class="text-sm font-medium text-slate-800">{{ project.title }}</p>
                         <p class="text-xs text-slate-400 mt-0.5">
                             {{ project.tasks_count }} task(s) assigned to you
                         </p>

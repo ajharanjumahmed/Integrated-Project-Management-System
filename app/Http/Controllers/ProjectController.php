@@ -51,18 +51,34 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+
         $project->load([
             'client',
             'manager',
             'milestones',
             'tasks.assignee',
             'tasks.milestone',
-            'members',       
+            'tasks.submissions.submitter',
+            'members.role',
             'workSessions.user',
         ]);
 
+        $existingMemberIds = $project->members->pluck('id');
+
+        $availableMembers = User::whereHas(
+            'role',
+            fn($q) =>
+            $q->whereIn('name', ['Designer', 'Developer'])
+        )
+            ->whereNotIn('id', $existingMemberIds)
+            ->select('id', 'name', 'role_id')
+            ->with('role:id,name')
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('Projects/Show', [
-            'project' => $project,
+            'project'          => $project,
+            'availableMembers' => $availableMembers,
         ]);
     }
 

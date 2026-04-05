@@ -91,12 +91,18 @@ class DashboardController extends Controller
             ->orderBy('deadline')
             ->get();
 
+        $alltasks = $user->assignedTasks()
+            ->with(['project', 'milestone'])
+            ->whereIn('status', ['pending', 'started', 'completed'])
+            ->orderBy('deadline')
+            ->get();
+
         return Inertia::render('Dashboard/DesignerDashboard', [
             'projects' => $projects,
             'tasks'    => $tasks,
-            'activeTasks'    => $tasks->where('status', 'started')->count(),
-            'completedTasks' => $tasks->where('status', 'completed')->count(),
-            'pendingTasks' => $tasks->where('status', 'pending')->count(),
+            'activeTasks'    => $alltasks->where('status', 'started')->count(),
+            'completedTasks' => $alltasks->where('status', 'completed')->count(),
+            'pendingTasks' => $alltasks->where('status', 'pending')->count(),
         ]);
     }
 
@@ -118,30 +124,43 @@ class DashboardController extends Controller
             ->orderBy('deadline')
             ->get();
 
+        $alltasks = $user->assignedTasks()
+            ->with(['project', 'milestone'])
+            ->whereIn('status', ['pending', 'started', 'completed'])
+            ->orderBy('deadline')
+            ->get();
+
         return Inertia::render('Dashboard/DeveloperDashboard', [
             'projects' => $projects,
             'tasks'    => $tasks,
-            'activeTasks'    => $tasks->where('status', 'started')->count(),
-            'completedTasks' => $tasks->where('status', 'completed')->count(),
-            'pendingTasks' => $tasks->where('status', 'pending')->count(),
+            'activeTasks'    => $alltasks->where('status', 'started')->count(),
+            'completedTasks' => $alltasks->where('status', 'completed')->count(),
+            'pendingTasks' => $alltasks->where('status', 'pending')->count(),
         ]);
     }
 
     // Client Dashboard
 
     public function clientDashboard(Request $request)
-    {
-        $client = $request->user();
+{
+    $client   = $request->user();
+    $projects = Project::where('client_id', $client->id)->get();
 
-        // Only load projects where this user is the client
-        $projects = Project::where('client_id', $client->id)
-            ->with(['manager', 'milestones'])
-            ->withCount(['tasks'])
-            ->latest()
-            ->get();
+    // Count submissions sent to this client awaiting review
+    $pendingReviews = \App\Models\Submission::whereHas('task.project', fn($q) =>
+            $q->where('client_id', $client->id)
+        )
+        ->where('client_submitted', true)
+        ->where('client_status', 'pending')
+        ->count();
 
-        return Inertia::render('Dashboard/ClientDashboard', [
-            'projects' => $projects,
-        ]);
-    }
+    return Inertia::render('Dashboard/ClientDashboard', [
+        'stats' => [
+            'totalProjects'     => $projects->count(),
+            'activeProjects'    => $projects->where('status', 'active')->count(),
+            'completedProjects' => $projects->where('status', 'completed')->count(),
+            'pendingReviews'    => $pendingReviews,
+        ],
+    ]);
+}
 }

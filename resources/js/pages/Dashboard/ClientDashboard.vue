@@ -1,108 +1,79 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 
 const user  = usePage().props.auth.user
 
 const props = defineProps({
-    projects: Array,
+    stats: Object,
 })
-
-const statusStyles = {
-    pending:   { badge: 'bg-amber-100 text-amber-700',     bar: 'bg-amber-400' },
-    active:    { badge: 'bg-blue-100 text-blue-700',       bar: 'bg-blue-500' },
-    completed: { badge: 'bg-emerald-100 text-emerald-700', bar: 'bg-emerald-500' },
-    cancelled: { badge: 'bg-red-100 text-red-700',         bar: 'bg-red-400' },
-}
-
-const milestoneStatusStyles = {
-    pending:   'bg-slate-100 text-slate-500',
-    running:   'bg-blue-100 text-blue-600',
-    completed: 'bg-emerald-100 text-emerald-600',
-}
-
-const formatDate = (d) => d
-    ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-    : '—'
-
-// % of milestones marked completed
-const progress = (project) => {
-    const total = project.milestones?.length ?? 0
-    if (!total) return 0
-    const done  = project.milestones.filter(m => m.status === 'completed').length
-    return Math.round((done / total) * 100)
-}
 </script>
 
 <template>
-<DashboardLayout title="My Projects">
+<DashboardLayout title="Dashboard">
 
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-slate-800">
-            Hi {{ user?.name?.split(' ')[0] }}, track your projects here 📊
+            Welcome, {{ user?.name?.split(' ')[0] }} 👋
         </h1>
-        <p class="text-slate-400 text-sm mt-1">You can see real-time progress on all your projects below.</p>
+        <p class="text-slate-400 text-sm mt-1">Here's a summary of your projects.</p>
     </div>
 
-    <!-- Empty state -->
-    <div v-if="!projects?.length"
-         class="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-20 text-center">
-        <p class="text-4xl mb-3">📭</p>
-        <p class="font-semibold text-slate-700">No projects yet</p>
-        <p class="text-slate-400 text-sm mt-1">Your project manager will add you to a project soon.</p>
-    </div>
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
-    <!-- Project cards -->
-    <div v-else class="space-y-5">
-        <div v-for="project in projects" :key="project.id" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 flex items-start justify-between gap-4 border-b border-slate-100">
-                <div>
-                    <h2 class="font-semibold text-slate-800">{{ project.title }}</h2>
-                    <p class="text-xs text-slate-400 mt-1">
-                        Manager: <span class="text-slate-600">{{ project.manager?.name ?? '—' }}</span>
-                        &nbsp;·&nbsp;
-                        Deadline: <span class="text-slate-600">{{ formatDate(project.deadline) }}</span>
-                    </p>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold capitalize shrink-0"
-                      :class="statusStyles[project.status]?.badge">
-                    {{ project.status }}
-                </span>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">📁</div>
+            <div>
+                <p class="text-2xl font-bold text-slate-800">{{ stats.totalProjects }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Total Projects</p>
             </div>
-
-            <div class="px-6 py-4">
-
-                <!-- Progress bar -->
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-xs font-medium text-slate-500">Milestone Progress</span>
-                        <span class="text-xs font-bold text-slate-700">{{ progress(project) }}%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div class="h-2 rounded-full transition-all duration-500"
-                             :class="statusStyles[project.status]?.bar ?? 'bg-blue-500'"
-                             :style="{ width: progress(project) + '%' }">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Milestone list -->
-                <div v-if="project.milestones?.length" class="space-y-2">
-                    <div v-for="m in project.milestones" :key="m.id"
-                         class="flex items-center justify-between text-sm py-1">
-                        <span class="text-slate-700 text-xs">{{ m.title }}</span>
-                        <span class="px-2 py-0.5 rounded-full text-xs capitalize"
-                              :class="milestoneStatusStyles[m.status]">
-                            {{ m.status }}
-                        </span>
-                    </div>
-                </div>
-
-                <p v-else class="text-xs text-slate-400 italic">No milestones defined yet.</p>
-
-            </div>
-
         </div>
+
+        <div class="bg-white rounded-2xl border border-blue-100 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">⚡</div>
+            <div>
+                <p class="text-2xl font-bold text-blue-600">{{ stats.activeProjects }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Active</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-xl flex items-center justify-center shrink-0">✅</div>
+            <div>
+                <p class="text-2xl font-bold text-emerald-600">{{ stats.completedProjects }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Completed</p>
+            </div>
+        </div>
+
+        <!-- Pending reviews — red if > 0 to signal urgency -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4"
+             :class="stats.pendingReviews > 0 ? 'border border-red-200' : 'border border-slate-100'">
+            <div class="w-10 h-10 rounded-xl text-xl flex items-center justify-center shrink-0"
+                 :class="stats.pendingReviews > 0 ? 'bg-red-50' : 'bg-slate-50'">
+                📬
+            </div>
+            <div>
+                <p class="text-2xl font-bold"
+                   :class="stats.pendingReviews > 0 ? 'text-red-600' : 'text-slate-800'">
+                    {{ stats.pendingReviews }}
+                </p>
+                <p class="text-xs text-slate-400 mt-0.5">Pending Reviews</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA to My Projects -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center justify-between">
+        <div>
+            <p class="font-semibold text-slate-800">View Your Projects</p>
+            <p class="text-sm text-slate-400 mt-0.5">See progress, milestones, and review submitted work.</p>
+        </div>
+        <Link href="/client/projects"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition shrink-0">
+            My Projects →
+        </Link>
     </div>
 
 </DashboardLayout>
