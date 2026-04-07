@@ -1,5 +1,5 @@
 <script setup>
-import { router, useForm } from '@inertiajs/vue3'
+import { router, useForm, Link } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { ref } from 'vue'
 
@@ -201,6 +201,11 @@ const toggleExpand = (taskId) => {
                         </button>
 
                     </div>
+                    <!-- Chat button — links to dedicated chat page -->
+                    <Link :href="`/chat/${project.id}`"
+                        class="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center gap-1.5">
+                    💬 Chat
+                    </Link>
                 </div>
 
                 <!-- Total task count for this project -->

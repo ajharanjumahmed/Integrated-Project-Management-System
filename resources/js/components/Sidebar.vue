@@ -37,7 +37,6 @@ const navItems = {
     'Client': [
         { href: '/client-dashboard', label: 'Dashboard', icon: HomeIcon, match: '/client-dashboard' },
         { href: '/client/projects', label: 'My Projects', icon: FolderIcon, match: '/client/projects' },
-        { href: '/client-dashboard', label: 'Messages', icon: ChatBubbleLeftRightIcon, match: '/messages' },
     ],
 }
 

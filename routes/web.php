@@ -12,6 +12,7 @@ use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\WorkSessionController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\MessageController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -75,6 +76,13 @@ Route::middleware(['auth', 'role:CEO,Project Manager'])->group(function () {
     Route::post('/submissions/{submission}/revision', [SubmissionController::class, 'requestRevision'])->name('submissions.revision');
     Route::post('/submissions/{submission}/submit-to-client', [SubmissionController::class, 'submitToClient'])->name('submissions.submit-to-client');
     Route::post('/submissions/{submission}/resubmit-to-client', [SubmissionController::class, 'resubmitToClient'])->name('submissions.resubmit-to-client');
+});
+
+// ── Chat — accessible by all authenticated users ────────────
+// Auth middleware applied, role check handled inside the controller
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat/{project}', [MessageController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{project}/messages', [MessageController::class, 'store'])->name('chat.store');
 });
 
 require __DIR__.'/settings.php';

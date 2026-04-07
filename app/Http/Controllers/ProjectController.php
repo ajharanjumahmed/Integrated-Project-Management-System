@@ -61,6 +61,11 @@ class ProjectController extends Controller
             'tasks.submissions.submitter',
             'members.role',
             'workSessions.user',
+            // Load messages ordered oldest first — chat reads top to bottom
+            // Load sender's role so we can show role badges in chat
+            'messages' => fn($q) => $q->with('sender:id,name,role_id')
+                ->with('sender.role:id,name')
+                ->oldest(),
         ]);
 
         $existingMemberIds = $project->members->pluck('id');

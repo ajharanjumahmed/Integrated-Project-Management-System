@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import ChatPanel from '@/components/ChatPanel.vue'
 
 const props = defineProps({
     project: Object,
@@ -104,7 +105,8 @@ const submitRevision = () => {
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5">
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">🧑‍💼</div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">🧑‍💼
+                </div>
                 <div>
                     <p class="text-lg font-semibold text-slate-800">{{ project.manager?.name ?? '—' }}</p>
                     <p class="text-xs text-slate-400 mt-1">Project Manager</p>
@@ -113,14 +115,14 @@ const submitRevision = () => {
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">🗓️</div>
                 <div>
-                    <p class="text-lg font-semibold text-slate-800">{{ formatDate(project.deadline)}}</p>
+                    <p class="text-lg font-semibold text-slate-800">{{ formatDate(project.deadline) }}</p>
                     <p class="text-xs text-slate-400 mt-1">Project Deadline</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-xl flex items-center justify-center shrink-0">💰</div>
                 <div>
-                    <p class="text-lg font-semibold text-slate-800">{{ formatCurrency(project.budget)}}</p>
+                    <p class="text-lg font-semibold text-slate-800">{{ formatCurrency(project.budget) }}</p>
                     <p class="text-xs text-slate-400 mt-1">Project Budget</p>
                 </div>
             </div>
@@ -287,6 +289,13 @@ const submitRevision = () => {
                 </div>
             </div>
 
+        </div>
+
+        <!-- ── Chat with PM ───────────────────────── -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
+            <ChatPanel :messages="project.messages ?? []" :project-id="project.id"
+                :thread-roles="['Project Manager', 'Designer', 'Developer', 'Client']" title="Dedicated Project Chat"
+                placeholder="Write your message here..." />
         </div>
 
         <!-- Revision modal -->

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { Link, useForm, router } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import ChatPanel from '@/components/ChatPanel.vue'
 
 const props = defineProps({
     project: Object,
@@ -484,7 +485,7 @@ const confirmDeleteTask = () => {
                                 <option value="developer">Developer</option>
                             </select>
                             <p v-if="memberForm.errors.role" class="text-red-500 text-xs mt-1">{{ memberForm.errors.role
-                                }}</p>
+                            }}</p>
                         </div>
                         <p v-if="availableMembers.length === 0" class="text-xs text-slate-400 italic">
                             All designers and developers are already on this project.
@@ -502,7 +503,7 @@ const confirmDeleteTask = () => {
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
                                 <span class="text-white text-xs font-bold">{{ member.name?.charAt(0)?.toUpperCase()
-                                    }}</span>
+                                }}</span>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-slate-700">{{ member.name }}</p>
@@ -927,74 +928,6 @@ const confirmDeleteTask = () => {
 
         </div>
 
-        <!-- ── Work Session History ───────────────── -->
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
-
-            <div class="px-6 py-4 border-b border-slate-100">
-                <h2 class="font-semibold text-slate-800">Work Session History</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Login and logout times for all team members</p>
-            </div>
-
-            <div v-if="!project.work_sessions?.length" class="px-6 py-10 text-center text-slate-400 text-sm">
-                <p class="text-2xl mb-2">🕐</p>
-                No work sessions recorded yet.
-            </div>
-
-            <div v-else class="divide-y divide-slate-50">
-                <div v-for="session in project.work_sessions" :key="session.id"
-                    class="flex items-center gap-4 px-6 py-3.5">
-
-                    <!-- User avatar -->
-                    <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
-                        <span class="text-white text-xs font-bold">
-                            {{ session.user?.name?.charAt(0)?.toUpperCase() }}
-                        </span>
-                    </div>
-
-                    <!-- Name + dates -->
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-slate-700">{{ session.user?.name }}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            {{ formatDate(session.start_time) }}
-                        </p>
-                    </div>
-
-                    <!-- Sign in time -->
-                    <div class="text-center hidden md:block">
-                        <p class="text-xs text-slate-400">Signed In</p>
-                        <p class="text-sm font-medium text-slate-700">
-                            {{ formatTime(session.start_time) }}
-                        </p>
-                    </div>
-
-                    <!-- Sign out time -->
-                    <div class="text-center hidden md:block">
-                        <p class="text-xs text-slate-400">Signed Out</p>
-                        <p class="text-sm font-medium text-slate-700">
-                            {{ session.end_time
-                                ? formatTime(session.end_time)
-                                : '—' }}
-                        </p>
-                    </div>
-
-                    <!-- Duration badge -->
-                    <div class="shrink-0">
-                        <span v-if="session.duration"
-                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
-                            {{ session.duration }} min
-                        </span>
-                        <!-- Active session — still in progress -->
-                        <span v-else
-                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 animate-pulse">
-                            Active
-                        </span>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-
         <!-- ── Submissions Review (PM) ────────────── -->
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
 
@@ -1005,7 +938,7 @@ const confirmDeleteTask = () => {
 
             <template v-if="project.tasks?.some(t => t.submissions?.length)">
 
-                <div v-for="task in project.tasks.filter(t => t.submissions?.length)" :key="task.id"> 
+                <div v-for="task in project.tasks.filter(t => t.submissions?.length)" :key="task.id">
 
                     <!-- Task header -->
                     <div class="px-6 py-2.5 bg-slate-100 border-b border-slate-100">
@@ -1029,14 +962,14 @@ const confirmDeleteTask = () => {
                                         </span>
                                     </div>
                                     <span class="text-sm font-medium text-slate-700">{{
-                                        submission.submitter?.name}}</span>
+                                        submission.submitter?.name }}</span>
                                     <span class="text-xs text-slate-400">{{ formatDate(submission.created_at) }}</span>
                                 </div>
 
                                 <p v-if="submission.comment"
                                     class="text-xs text-semibold text-slate-700 ml-8 mb-3 mt-3">
                                     Note: <span class="text-xs text-slate-500 italic mb-3 mt-3"> {{ submission.comment
-                                        }} </span>
+                                    }} </span>
                                 </p>
 
                                 <!-- Designer's file -->
@@ -1063,8 +996,8 @@ const confirmDeleteTask = () => {
                                     'bg-emerald-100 text-emerald-700': submission.status === 'approved',
                                     'bg-red-100 text-red-600': submission.status === 'revision_requested',
                                 }">
-                                    {{ submission.status.replace(/_/g, ' ')
-                                    .replace(/\b\w/g, char => char.toUpperCase()) }}
+                                    {{submission.status.replace(/_/g, ' ')
+                                        .replace(/\b\w/g, char => char.toUpperCase())}}
                                 </span>
 
                                 <!-- Client status (if sent to client) -->
@@ -1076,7 +1009,7 @@ const confirmDeleteTask = () => {
                                     }">
                                     Client: {{submission.client_status
                                         .replace(/_/g, ' ')
-                                    .replace(/\b\w/g, char => char.toUpperCase()) }}
+                                        .replace(/\b\w/g, char => char.toUpperCase())}}
                                 </span>
 
                                 <!-- PM review actions — only for pending_review -->
@@ -1198,6 +1131,84 @@ const confirmDeleteTask = () => {
             <div v-else class="px-6 py-10 text-center text-slate-400 text-sm">
                 <p class="text-2xl mb-2">📬</p>
                 No submissions yet.
+            </div>
+
+        </div>
+
+        <!-- ── Project Chat ──────────────────────────── -->
+        <div class="grid md:grid-cols-1 gap-6 mt-6">
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <ChatPanel :messages="project.messages ?? []" :project-id="project.id"
+                    :thread-roles="['Project Manager', 'Designer', 'Developer', 'Client']" title="Dedicated Project Chat"
+                    placeholder="Write your message here..." />
+            </div>
+
+        </div>
+
+        <!-- ── Work Session History ───────────────── -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
+
+            <div class="px-6 py-4 border-b border-slate-100">
+                <h2 class="font-semibold text-slate-800">Work Session History</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Login and logout times for all team members</p>
+            </div>
+
+            <div v-if="!project.work_sessions?.length" class="px-6 py-10 text-center text-slate-400 text-sm">
+                <p class="text-2xl mb-2">🕐</p>
+                No work sessions recorded yet.
+            </div>
+
+            <div v-else class="divide-y divide-slate-50">
+                <div v-for="session in project.work_sessions" :key="session.id"
+                    class="flex items-center gap-4 px-6 py-3.5">
+
+                    <!-- User avatar -->
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+                        <span class="text-white text-xs font-bold">
+                            {{ session.user?.name?.charAt(0)?.toUpperCase() }}
+                        </span>
+                    </div>
+
+                    <!-- Name + dates -->
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-700">{{ session.user?.name }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            {{ formatDate(session.start_time) }}
+                        </p>
+                    </div>
+
+                    <!-- Sign in time -->
+                    <div class="text-center hidden md:block">
+                        <p class="text-xs text-slate-400">Signed In</p>
+                        <p class="text-sm font-medium text-slate-700">
+                            {{ formatTime(session.start_time) }}
+                        </p>
+                    </div>
+
+                    <!-- Sign out time -->
+                    <div class="text-center hidden md:block">
+                        <p class="text-xs text-slate-400">Signed Out</p>
+                        <p class="text-sm font-medium text-slate-700">
+                            {{ session.end_time
+                                ? formatTime(session.end_time)
+                                : '—' }}
+                        </p>
+                    </div>
+
+                    <!-- Duration badge -->
+                    <div class="shrink-0">
+                        <span v-if="session.duration"
+                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+                            {{ session.duration }} min
+                        </span>
+                        <!-- Active session — still in progress -->
+                        <span v-else
+                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 animate-pulse">
+                            Active
+                        </span>
+                    </div>
+
+                </div>
             </div>
 
         </div>

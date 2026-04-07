@@ -16,13 +16,13 @@ class Message extends Model
         'created_at' => 'datetime',
     ];
 
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
-    }
-
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

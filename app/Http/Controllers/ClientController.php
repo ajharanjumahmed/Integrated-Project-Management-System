@@ -45,6 +45,10 @@ class ClientController extends Controller
                 ->where('client_submitted', true)
                 ->with('submitter:id,name')
                 ->latest(),
+            // Load messages for this project
+            'messages' => fn($q) => $q->with('sender:id,name,role_id')
+                ->with('sender.role:id,name')
+                ->oldest(),
         ]);
 
         return Inertia::render('Client/ProjectShow', [
