@@ -50,10 +50,9 @@ const priorityDot = {
 
 const formatTime = (datetime) => {
     if (!datetime) return '—'
-    let str = String(datetime).trim()
-    if (!str.includes('T')) str = str.replace(' ', 'T')
-    if (!str.endsWith('Z') && !str.includes('+')) str += 'Z'
-    return new Date(str).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return new Date(datetime).toLocaleTimeString([], {
+        hour: '2-digit', minute: '2-digit'
+    })
 }
 
 // ── PM Submission review ──────────────────────────────────────
@@ -1107,7 +1106,7 @@ const confirmDeleteTask = () => {
                                     <label class="block text-xs font-medium text-slate-600 mb-1">Updated File
                                         (optional)</label>
                                     <input type="file" @change="resubmitFile = $event.target.files[0]"
-                                        class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white" />
+                                        class="w-full text-xs text-slate-400 border border-slate-200 rounded-xl px-3 py-2 bg-white" />
                                 </div>
                                 <div class="flex gap-2">
                                     <button @click="resubmitToClient" :disabled="resubmitting"
@@ -1150,7 +1149,7 @@ const confirmDeleteTask = () => {
 
             <div class="px-6 py-4 border-b border-slate-100">
                 <h2 class="font-semibold text-slate-800">Work Session History</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Login and logout times for all team members</p>
+                <p class="text-xs text-slate-400 mt-0.5">Work times for all team members</p>
             </div>
 
             <div v-if="!project.work_sessions?.length" class="px-6 py-10 text-center text-slate-400 text-sm">
@@ -1177,15 +1176,15 @@ const confirmDeleteTask = () => {
                         </p>
                     </div>
 
-                    <!-- Sign in time -->
+                    <!-- Sign in time
                     <div class="text-center hidden md:block">
                         <p class="text-xs text-slate-400">Signed In</p>
                         <p class="text-sm font-medium text-slate-700">
                             {{ formatTime(session.start_time) }}
                         </p>
-                    </div>
+                    </div> -->
 
-                    <!-- Sign out time -->
+                     <!-- Sign out time
                     <div class="text-center hidden md:block">
                         <p class="text-xs text-slate-400">Signed Out</p>
                         <p class="text-sm font-medium text-slate-700">
@@ -1193,12 +1192,13 @@ const confirmDeleteTask = () => {
                                 ? formatTime(session.end_time)
                                 : '—' }}
                         </p>
-                    </div>
+                    </div>  -->
 
                     <!-- Duration badge -->
-                    <div class="shrink-0">
+                    <div class="shrink-0 align-self-start text-center">
+                        <p class="text-xs text-slate-400 mb-1">Total Work Time</p>
                         <span v-if="session.duration"
-                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+                            class="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
                             {{ session.duration }} min
                         </span>
                         <!-- Active session — still in progress -->

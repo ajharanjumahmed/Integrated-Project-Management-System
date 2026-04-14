@@ -7,6 +7,7 @@ import {
     ClipboardDocumentListIcon,
     ChatBubbleLeftRightIcon,
     ArrowRightStartOnRectangleIcon,
+    ChartBarIcon,
 } from '@heroicons/vue/24/outline'
 
 const page = usePage()
@@ -18,9 +19,10 @@ const logout = () => router.post('/logout')
 
 const navItems = {
     'CEO': [
-        { href: '/ceo-dashboard', label: 'Dashboard', icon: HomeIcon, match: '/ceo-dashboard' },
+        { href: '/ceo-dashboard', label: 'Dashboard', icon: ChartBarIcon, match: '/ceo-dashboard' },
         { href: '/users', label: 'Users', icon: UsersIcon, match: '/users' },
         { href: '/projects', label: 'Projects', icon: FolderIcon, match: '/projects' },
+        { href: '/ceo/clients', label: 'Clients', icon: UsersIcon, match: '/ceo/clients' },
     ],
     'Project Manager': [
         { href: '/manager-dashboard', label: 'Dashboard', icon: HomeIcon, match: '/manager-dashboard' },

@@ -32,19 +32,80 @@ class DashboardController extends Controller
     // CEO Dashboard
     public function ceoDashboard()
     {
+        // Revenue per project — we need this for the earnings breakdown table
+        $projects = Project::with(['client:id,name', 'manager:id,name'])
+            ->withCount(['tasks', 'members'])
+            ->orderByDesc('budget')
+            ->get();
+
+        // User counts grouped by role
+        $usersByRole = \App\Models\Role::withCount('users')->get()
+            ->mapWithKeys(fn($r) => [$r->name => $r->users_count]);
+
+        // Top earners (project managers with most total budget under management)
+        $topManagers = User::whereHas('role', fn($q) => $q->where('name', 'Project Manager'))
+            ->with('role:id,name')
+            ->withSum('managedProjects', 'budget')
+            ->withCount('managedProjects')
+            ->orderByDesc('managed_projects_sum_budget')
+            ->limit(5)
+            ->get();
+
+        // Total work hours logged across all projects
+        $totalWorkMinutes = \App\Models\WorkSession::whereNotNull('end_time')
+            ->sum('duration');
+
+        // Most active team members by total work minutes
+        $topWorkers = User::whereHas(
+            'role',
+            fn($q) =>
+            $q->whereIn('name', ['Designer', 'Developer'])
+        )
+            ->withSum('workSessions', 'duration')
+            ->orderByDesc('work_sessions_sum_duration')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('Dashboard/CeoDashboard', [
             'stats' => [
                 'totalUsers'        => User::count(),
-                'totalProjects'     => Project::count(),
-                'activeProjects'    => Project::where('status', 'active')->count(),
-                'completedProjects' => Project::where('status', 'completed')->count(),
-                'totalRevenue'      => Project::sum('budget'),
+                'totalProjects'     => $projects->count(),
+                'activeProjects'    => $projects->where('status', 'active')->count(),
+                'completedProjects' => $projects->where('status', 'completed')->count(),
+                'pendingProjects'   => $projects->where('status', 'pending')->count(),
+                'cancelledProjects' => $projects->where('status', 'cancelled')->count(),
+                'totalRevenue'      => $projects->sum('budget'),
+                'activeRevenue'     => $projects->where('status', 'active')->sum('budget'),
+                'completedRevenue'  => $projects->where('status', 'completed')->sum('budget'),
+                'totalWorkHours'    => round($totalWorkMinutes / 60, 1),
             ],
-            // Recent projects for the dashboard table
-            'recentProjects' => Project::with(['client', 'manager'])
-                ->latest()
-                ->limit(5)
-                ->get(),
+            'usersByRole'  => $usersByRole,
+            'projects'     => $projects->take(10),   // recent 10 for table
+            'topManagers'  => $topManagers,
+            'topWorkers'   => $topWorkers,
+        ]);
+    }
+
+    public function ceoClients()
+    {
+        $clients = User::whereHas('role', fn($q) => $q->where('name', 'Client'))
+            ->with('clientProfile')
+            ->withCount([
+                'clientProjects',
+
+                'clientProjects as active_projects_count' => function ($q) {
+                    $q->where('status', 'active');
+                },
+
+                'clientProjects as completed_projects_count' => function ($q) {
+                    $q->where('status', 'completed');
+                },
+            ])
+            ->latest()
+            ->get();
+
+        return Inertia::render('CEO/Clients', [
+            'clients' => $clients,
         ]);
     }
 
@@ -142,25 +203,27 @@ class DashboardController extends Controller
     // Client Dashboard
 
     public function clientDashboard(Request $request)
-{
-    $client   = $request->user();
-    $projects = Project::where('client_id', $client->id)->get();
+    {
+        $client   = $request->user();
+        $projects = Project::where('client_id', $client->id)->get();
 
-    // Count submissions sent to this client awaiting review
-    $pendingReviews = \App\Models\Submission::whereHas('task.project', fn($q) =>
+        // Count submissions sent to this client awaiting review
+        $pendingReviews = \App\Models\Submission::whereHas(
+            'task.project',
+            fn($q) =>
             $q->where('client_id', $client->id)
         )
-        ->where('client_submitted', true)
-        ->where('client_status', 'pending')
-        ->count();
+            ->where('client_submitted', true)
+            ->where('client_status', 'pending')
+            ->count();
 
-    return Inertia::render('Dashboard/ClientDashboard', [
-        'stats' => [
-            'totalProjects'     => $projects->count(),
-            'activeProjects'    => $projects->where('status', 'active')->count(),
-            'completedProjects' => $projects->where('status', 'completed')->count(),
-            'pendingReviews'    => $pendingReviews,
-        ],
-    ]);
-}
+        return Inertia::render('Dashboard/ClientDashboard', [
+            'stats' => [
+                'totalProjects'     => $projects->count(),
+                'activeProjects'    => $projects->where('status', 'active')->count(),
+                'completedProjects' => $projects->where('status', 'completed')->count(),
+                'pendingReviews'    => $pendingReviews,
+            ],
+        ]);
+    }
 }

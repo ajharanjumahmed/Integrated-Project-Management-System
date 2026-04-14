@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])
 Route::middleware(['auth', 'role:CEO'])->group(function () {
     Route::get('/ceo-dashboard', [DashboardController::class, 'ceoDashboard'])->name('ceo.dashboard');
     Route::resource('users', UserController::class);
+    Route::get('/ceo/clients', [DashboardController::class, 'ceoClients'])->name('ceo.clients');
 });
 
 // ── Project Manager ────────────────────────────────────────────

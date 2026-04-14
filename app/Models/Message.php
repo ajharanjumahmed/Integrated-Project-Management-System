@@ -16,6 +16,11 @@ class Message extends Model
         'created_at' => 'datetime',
     ];
 
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d\TH:i:s\Z');
+    }
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

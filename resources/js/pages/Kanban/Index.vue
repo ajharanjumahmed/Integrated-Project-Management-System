@@ -124,11 +124,8 @@ const signOut = (projectId) => {
 
 // Format start_time into "Signed in at HH:MM" for the active badge
 const formatTime = (datetime) => {
-    if (!datetime) return '—'
-    let str = String(datetime).trim()
-    if (!str.includes('T')) str = str.replace(' ', 'T')
-    if (!str.endsWith('Z') && !str.includes('+')) str += 'Z'
-    return new Date(str).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    if (!datetime) return ''
+    return new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 const toggleExpand = (taskId) => {

@@ -63,18 +63,12 @@ const onKeydown = (e) => {
 // Format message timestamp
 const formatTime = (datetime) => {
     if (!datetime) return ''
-    let str = String(datetime).trim()
-    if (!str.includes('T')) str = str.replace(' ', 'T')
-    if (!str.endsWith('Z') && !str.includes('+')) str += 'Z'
-    return new Date(str).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 const formatDay = (datetime) => {
     if (!datetime) return ''
-    let str = String(datetime).trim()
-    if (!str.includes('T')) str = str.replace(' ', 'T')
-    if (!str.endsWith('Z') && !str.includes('+')) str += 'Z'
-    return new Date(str).toLocaleDateString([], { month: 'short', day: 'numeric' })
+    return new Date(datetime).toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
 
 // Auto-scroll when component mounts
